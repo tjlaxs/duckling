@@ -9,7 +9,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Duckling.TimeGrain.FI.Rules
-  ( rules ) where
+  ( rules
+  ) where
 
 import Data.String
 import Data.Text (Text)
@@ -20,14 +21,14 @@ import Duckling.Types
 import qualified Duckling.TimeGrain.Types as TG
 
 grains :: [(Text, String, TG.Grain)]
-grains = [ ("second (grain) ", "sekuntia?|s",                                TG.Second)
-         , ("minute (grain)" , "minuuttia?|min",                             TG.Minute)
-         , ("hour (grain)"   , "tuntia?|t|h",                                TG.Hour)
-         , ("day (grain)"    , "päiv\x00E4(\x00E4)?|vuorokau(si|tta)|vrk|d", TG.Day)
-         , ("week (grain)"   , "viikkoa?|vko?",                              TG.Week)
-         , ("month (grain)"  , "kuukau(si|tta)|kk",                          TG.Month)
-         , ("quarter (grain)", "kvartaali(a)?|nelj\x00E4nnesvuo(si|tta)",    TG.Quarter)
-         , ("year (grain)"   , "vuo(si|tta)|v\\.?|a",                         TG.Year)
+grains = [ ("second (grain) ", "sekuntia?|s", TG.Second)
+         , ("minute (grain)" , "minuuttia?|min", TG.Minute)
+         , ("hour (grain)"   , "tuntia?|h", TG.Hour)
+         , ("day (grain)"    , "päivä(ä)?|vuorokau(si|tta)|vrk|d", TG.Day)
+         , ("week (grain)"   , "viikkoa?|vko?", TG.Week)
+         , ("month (grain)"  , "kuukau(si|tta)|kk", TG.Month)
+         , ("quarter (grain)", "kvartaali(a)?|neljännesvuo(si|tta)", TG.Quarter)
+         , ("year (grain)"   , "vuo(si|tta)|v\\.?|a", TG.Year)
          ]
 
 rules :: [Rule]

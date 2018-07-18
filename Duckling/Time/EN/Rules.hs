@@ -105,9 +105,9 @@ ruleAbsorbOnADOW = Rule
 
 ruleAbsorbInMonthYear :: Rule
 ruleAbsorbInMonthYear = Rule
-  { name = "in <named-month>|year"
+  { name = "in|during <named-month>|year"
   , pattern =
-    [ regex "in"
+    [ regex "in|during"
     , Predicate $ or . sequence [isAMonth, isGrainOfTime TG.Year]
     ]
   , prod = \tokens -> case tokens of
@@ -437,6 +437,29 @@ ruleDOMMonth = Rule
     ]
   , prod = \tokens -> case tokens of
       (token:Token Time td:_) -> Token Time <$> intersectDOM td token
+      _ -> Nothing
+  }
+
+ruleDOMMonthYear :: Rule
+ruleDOMMonthYear = Rule
+  { name = "<day-of-month>(ordinal or number)/<named-month>/year"
+  , pattern =
+    [ Predicate isDOMValue
+    , regex "[-/\\s]"
+    , Predicate isAMonth
+    , regex "[-/\\s]"
+    , regex "(\\d{4})"
+    ]
+  , prod = \tokens -> case tokens of
+      (token:
+       _:
+       Token Time td:
+       _:
+       Token RegexMatch (GroupMatch (match:_)):
+       _) -> do
+         intVal <- parseInt match
+         dom <- intersectDOM td token
+         Token Time <$> intersect dom (year intVal)
       _ -> Nothing
   }
 
@@ -773,12 +796,26 @@ ruleYYYYMMDD = Rule
   , pattern =
     [ regex "(\\d{2,4})-(0?[1-9]|1[0-2])-(3[01]|[12]\\d|0?[1-9])"
     ]
-  , prod = \tokens -> case tokens of
+  , prod = \case
       (Token RegexMatch (GroupMatch (yy:mm:dd:_)):_) -> do
         y <- parseInt yy
         m <- parseInt mm
         d <- parseInt dd
         tt $ yearMonthDay y m d
+      _ -> Nothing
+  }
+
+ruleYYYYQQ :: Rule
+ruleYYYYQQ = Rule
+  { name = "yyyyqq"
+  , pattern =
+    [ regex "(\\d{2,4})q([1-4])"
+    ]
+  , prod = \case
+      (Token RegexMatch (GroupMatch (yy:qq:_)):_) -> do
+        y <- parseInt yy
+        q <- parseInt qq
+        tt . cycleNthAfter True TG.Quarter (q - 1) $ year y
       _ -> Nothing
   }
 
@@ -788,7 +825,7 @@ ruleNoonMidnightEOD = Rule
   , pattern =
     [ regex "(noon|midni(ght|te)|(the )?(EOD|end of (the )?day))"
     ]
-  , prod = \tokens -> case tokens of
+  , prod = \case
       (Token RegexMatch (GroupMatch (match:_)):_) -> tt . hour False $
         if Text.toLower match == "noon" then 12 else 0
       _ -> Nothing
@@ -1678,9 +1715,9 @@ ruleComputedHolidays = mkRuleHolidays
     , cycleNthAfter False TG.Day (-1) orthodoxEaster )
   , ( "Orthodox Great Friday", "orthodox\\s+great(\\s+and\\s+holy)?\\s+friday"
     , cycleNthAfter False TG.Day (-2) orthodoxEaster )
-  , ( "Orthodox Palm Sunday", "orthodox\\s+(branch|palm|yew\\s+sunday)"
+  , ( "Orthodox Palm Sunday", "orthodox\\s+(branch|palm|yew)\\s+sunday"
     , cycleNthAfter False TG.Day (-7) orthodoxEaster )
-  , ( "Palm Sunday", "branch|palm|yew\\s+sunday"
+  , ( "Palm Sunday", "(branch|palm|yew)\\s+sunday"
     , cycleNthAfter False TG.Day (-7) easterSunday )
   , ( "Pentecost", "pentecost|white sunday|whitsunday"
     , cycleNthAfter False TG.Day 49 easterSunday )
@@ -2225,6 +2262,7 @@ rules =
   , ruleDOMMonth
   , ruleDOMOfMonth
   , ruleDOMOrdinalMonthYear
+  , ruleDOMMonthYear
   , ruleIdesOfMonth
   , ruleTODLatent
   , ruleAtTOD
@@ -2246,6 +2284,7 @@ rules =
   , ruleHalfAfterHOD
   , ruleQuarterAfterHOD
   , ruleHalfHOD
+  , ruleYYYYQQ
   , ruleYYYYMMDD
   , ruleMMYYYY
   , ruleNoonMidnightEOD

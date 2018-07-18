@@ -6,7 +6,6 @@
 -- of patent rights can be found in the PATENTS file in the same directory.
 
 {-# LANGUAGE GADTs #-}
-{-# LANGUAGE OverloadedStrings #-}
 
 module Duckling.Rules.FI
   ( defaultRules
@@ -16,8 +15,6 @@ module Duckling.Rules.FI
 
 import Duckling.Dimensions.Types
 import Duckling.Locale
-import Duckling.Types
-import Duckling.Dimensions.Types
 import Duckling.Types
 import qualified Duckling.Numeral.FI.Rules as Numeral
 import qualified Duckling.TimeGrain.FI.Rules as TimeGrain

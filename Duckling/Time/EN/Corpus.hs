@@ -43,6 +43,8 @@ defaultCorpus = (testContext, testOptions, allExamples ++ custom)
                  , "10/31/74"
                  , "10-31-74"
                  , "10.31.1974"
+                 , "31/Oct/1974"
+                 , "31st Oct 1974"
                  ]
       , examples (datetime (2013, 4, 25, 16, 0, 0) Minute)
                  [ "4/25 at 4:00pm"
@@ -105,6 +107,7 @@ negativeCorpus = (testContext, testOptions, examples)
       , "4a"
       , "4a."
       , "A4 A5"
+      , "palm"
       ]
 
 latentCorpus :: Corpus
@@ -327,6 +330,8 @@ allExamples = concat
              [ "4th quarter 2018"
              , "4th qtr 2018"
              , "the 4th qtr of 2018"
+             , "18q4"
+             , "2018Q4"
              ]
   , examples (datetime (2012, 1, 1, 0, 0, 0) Year)
              [ "last year"
@@ -1103,6 +1108,7 @@ allExamples = concat
   , examples (datetime (2013, 3, 1, 0, 0, 0) Month)
              [ "March"
              , "in March"
+             , "during March"
              ]
   , examples (datetime (2013, 2, 13, 17, 0, 0) Hour)
              [ "tomorrow afternoon at 5"
